@@ -1,0 +1,208 @@
+Act as a senior mobile product designer and UI/UX expert.
+
+Generate the design directly in the current Figma design file.
+
+Important:
+- The attached file `брендбук.jpg` is the single source of truth for the visual language.
+- Before designing anything, carefully analyze the brand book and extract:
+  - exact color palette
+  - typography system
+  - logo usage rules
+  - iconography style
+  - spacing and layout logic
+  - gradients, textures, decorative shapes, and visual motifs only if they are present in the brand book
+- Follow the brand book as strictly as possible.
+- Do not invent a new visual style outside the brand system.
+- All app copy must be in Russian.
+
+Project context:
+Design a mobile MVP app for employee training.
+The app is for internal corporate use.
+Platforms: iOS and Android.
+Core user tasks:
+- study learning materials
+- take quizzes/tests
+- track progress
+- view assigned courses
+
+Design goal:
+Create a complete high-fidelity mobile app design that feels:
+- professional
+- modern
+- clean
+- consistent
+- easy to use
+- fully aligned with the brand book
+
+Do not change the product scope.
+Do not add unnecessary features.
+This is an MVP, so the design must remain realistic and easy to implement.
+
+Create the work in 3 structured sections on the page:
+
+SECTION 1 — Brand Foundations
+Create a foundation area with:
+- color styles from the brand book
+- text styles from the brand book
+- logo usage examples
+- spacing rules
+- corner radius rules
+- shadows or depth rules only if supported by the brand book
+- gradients only if supported by the brand book
+- icon style guidance
+- a short note describing the brand tone and visual system
+
+SECTION 2 — Reusable Component System
+Create reusable mobile UI components with variants:
+- primary button
+- secondary button
+- ghost/text button
+- text input
+- password input
+- search field
+- course card
+- lesson card
+- progress card
+- quiz answer option
+- tabs / segmented control
+- bottom navigation
+- top app bar
+- chips / tags
+- status badge
+- progress bar
+- empty state
+- success and error message blocks
+- modal / bottom sheet if needed
+
+Requirements for components:
+- use auto layout
+- create reusable components
+- keep sizes consistent
+- use only the extracted brand colors and typography
+- ensure all components look like one system
+
+SECTION 3 — High-Fidelity Mobile Screens
+Create complete mobile screens with consistent styling and reusable components.
+
+Use a mobile frame size suitable for modern iOS/Android screens.
+Keep layouts mobile-first and production-ready.
+
+Create these screens:
+
+1. Splash / welcome screen
+- include logo according to brand rules
+- use the brand feel immediately
+
+2. Onboarding screen 1
+- explain learning access
+- Russian text
+
+3. Onboarding screen 2
+- explain tests and assessment
+- Russian text
+
+4. Onboarding screen 3
+- explain progress tracking
+- Russian text
+
+5. Login screen
+- Russian UI
+- clean auth layout
+- logo placement according to brand book
+
+6. Sign up screen
+- if sign up fits the MVP, keep it simple
+- otherwise make it an employee access request / registration form
+
+7. Home dashboard
+- greeting
+- assigned courses
+- progress summary
+- quick access to latest lesson or next step
+
+8. Course catalog
+- searchable list/grid of available courses
+- filters only if visually simple
+
+9. Course details
+- course cover / header
+- description
+- lesson list
+- progress
+- start / continue action
+
+10. Lesson screen
+- support text/video lesson format
+- content-first layout
+- clear hierarchy
+- CTA to continue or start quiz
+
+11. Quiz / assessment screen
+- question
+- answer choices
+- progress indicator
+- next / submit flow
+
+12. Quiz result screen
+- result summary
+- score
+- status
+- next action
+
+13. Progress tracking screen
+- completed courses
+- current progress
+- simple stats
+
+14. Profile screen
+- user info
+- learning summary
+- settings / logout
+
+Russian copy examples:
+- Добро пожаловать
+- Войти
+- Начать обучение
+- Мои курсы
+- Каталог курсов
+- Продолжить
+- Урок
+- Тест
+- Следующий вопрос
+- Завершить тест
+- Результат
+- Прогресс
+- Профиль
+
+Visual rules:
+- follow the brand book exactly
+- if the brand book contains gradients, use them consistently across key surfaces
+- if the brand book does not contain gradients, do not invent them
+- keep all screens stylistically unified
+- use consistent spacing, alignment, typography, radius, and component behavior
+- prioritize readability and clarity
+- avoid unnecessary decorative elements
+- avoid gamification unless clearly supported by the brand identity
+- avoid random illustrations or icon styles that do not match the brand book
+
+UX rules:
+- simple navigation
+- clear visual hierarchy
+- accessible contrast
+- touch-friendly spacing
+- intuitive screen flow
+- realistic MVP patterns
+
+Output requirements:
+- high-fidelity mobile UI
+- organized Figma page
+- reusable components
+- consistent naming
+- clean auto layout structure
+- visually unified system
+- ready for handoff to development
+
+If some detail is missing in the brand book:
+- infer conservatively
+- stay as close as possible to the detected brand identity
+- prefer the simplest consistent option
