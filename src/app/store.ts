@@ -1,83 +1,106 @@
 import { create } from "zustand";
+import type { AuthSession, CourseSummary } from "../domain/mvp";
+import { courses as mockCourses } from "./lib/mock-data";
 
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  totalLessons: number;
-  completedLessons: number;
-  status: "not_started" | "in_progress" | "completed";
+const SESSION_STORAGE_KEY = "annaelle-mvp-session-v2";
+
+function readStoredSession(): AuthSession | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const rawValue = window.localStorage.getItem(SESSION_STORAGE_KEY);
+
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawValue) as AuthSession;
+  } catch {
+    window.localStorage.removeItem(SESSION_STORAGE_KEY);
+    return null;
+  }
 }
 
-interface UserState {
+function persistSession(session: AuthSession | null) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (!session) {
+    window.localStorage.removeItem(SESSION_STORAGE_KEY);
+    return;
+  }
+
+  window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+}
+
+interface AppState {
+  session: AuthSession | null;
+  isAuthenticated: boolean;
   isAdmin: boolean;
+  courses: CourseSummary[];
+  hydrateSession: () => void;
+  setSession: (session: AuthSession) => void;
+  clearSession: () => void;
   toggleAdmin: () => void;
-  courses: Course[];
-  markLessonComplete: (courseId: string) => void;
-  markTestPassed: (courseId: string) => void;
 }
 
-export const useStore = create<UserState>((set) => ({
-  isAdmin: false,
+const initialSession = readStoredSession();
+
+function toLegacyCourseSummaries(): CourseSummary[] {
+  return mockCourses.map((course) => ({
+    id: course.id,
+    title: course.title,
+    description: course.description,
+    progress: course.progress,
+    totalLessons: course.totalLessons,
+    completedLessons: course.completedLessons,
+    color: course.color,
+    isMandatory: course.isMandatory,
+    isRecommended: Boolean(course.isRecommended),
+    deadline: course.deadline,
+    status:
+      course.progress >= 100 || course.completedLessons >= course.totalLessons
+        ? "completed"
+        : course.progress > 0 || course.completedLessons > 0
+          ? "in_progress"
+          : "not_started",
+  }));
+}
+
+export const useStore = create<AppState>((set) => ({
+  session: initialSession,
+  isAuthenticated: Boolean(initialSession),
+  isAdmin: initialSession?.user.role === "admin",
+  courses: toLegacyCourseSummaries(),
+  hydrateSession: () => {
+    const session = readStoredSession();
+    set({
+      session,
+      isAuthenticated: Boolean(session),
+      isAdmin: session?.user.role === "admin",
+      courses: toLegacyCourseSummaries(),
+    });
+  },
+  setSession: (session) => {
+    persistSession(session);
+    set({
+      session,
+      isAuthenticated: true,
+      isAdmin: session.user.role === "admin",
+      courses: toLegacyCourseSummaries(),
+    });
+  },
+  clearSession: () => {
+    persistSession(null);
+    set({
+      session: null,
+      isAuthenticated: false,
+      isAdmin: false,
+      courses: toLegacyCourseSummaries(),
+    });
+  },
   toggleAdmin: () => set((state) => ({ isAdmin: !state.isAdmin })),
-  courses: [
-    {
-      id: "1",
-      title: "Основы корпоративной этики",
-      description: "Базовый курс для новых сотрудников о ценностях компании.",
-      progress: 60,
-      totalLessons: 5,
-      completedLessons: 3,
-      status: "in_progress",
-    },
-    {
-      id: "2",
-      title: "Стандарты обслуживания",
-      description: "Как общаться с клиентами и решать сложные ситуации.",
-      progress: 0,
-      totalLessons: 4,
-      completedLessons: 0,
-      status: "not_started",
-    },
-    {
-      id: "3",
-      title: "Продуктовая линейка 2024",
-      description: "Новые продукты и их ключевые преимущества.",
-      progress: 100,
-      totalLessons: 3,
-      completedLessons: 3,
-      status: "completed",
-    },
-  ],
-  markLessonComplete: (courseId) =>
-    set((state) => ({
-      courses: state.courses.map((c) => {
-        if (c.id === courseId && c.completedLessons < c.totalLessons) {
-          const newCompleted = c.completedLessons + 1;
-          const newProgress = Math.round((newCompleted / c.totalLessons) * 100);
-          return {
-            ...c,
-            completedLessons: newCompleted,
-            progress: newProgress,
-            status: newProgress === 100 ? "completed" : "in_progress",
-          };
-        }
-        return c;
-      }),
-    })),
-  markTestPassed: (courseId) =>
-    set((state) => ({
-      courses: state.courses.map((c) => {
-        if (c.id === courseId) {
-          return {
-            ...c,
-            progress: 100,
-            completedLessons: c.totalLessons,
-            status: "completed",
-          };
-        }
-        return c;
-      }),
-    })),
 }));

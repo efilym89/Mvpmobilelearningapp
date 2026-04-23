@@ -1,71 +1,124 @@
-import { createBrowserRouter } from "react-router";
+import type { ComponentType } from "react";
+import { Navigate, createBrowserRouter, createHashRouter, useLocation } from "react-router";
 import { MobileLayout, StandaloneLayout } from "./components/layout/MobileLayout";
-import Onboarding from "./pages/Onboarding";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Home from "./pages/Home";
-import Catalog from "./pages/Catalog";
-import CourseDetail from "./pages/CourseDetail";
-import Lesson from "./pages/Lesson";
-import Test from "./pages/Test";
-import Result from "./pages/Result";
-import Profile from "./pages/Profile";
-import Quiz from "./pages/Quiz";
-import Certificate from "./pages/Certificate";
-import Dashboard from "./pages/Dashboard";
-import ForgotPassword from "./pages/ForgotPassword";
-import { Navigate } from "react-router";
+import { USE_HASH_ROUTER } from "./lib/runtime";
+import { useStore } from "./store";
+import LoginPage from "./pages/mvp/LoginPage";
 
-export const router = createBrowserRouter([
+function RootEntry() {
+  const isAuthenticated = useStore((state) => state.isAuthenticated);
+
+  return <Navigate to={isAuthenticated ? "/home" : "/onboarding"} replace />;
+}
+
+function PublicStandaloneLayout() {
+  const isAuthenticated = useStore((state) => state.isAuthenticated);
+
+  if (isAuthenticated) {
+    return <Navigate to="/home" replace />;
+  }
+
+  return <StandaloneLayout />;
+}
+
+function ProtectedMobileLayout() {
+  const isAuthenticated = useStore((state) => state.isAuthenticated);
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/onboarding" replace state={{ from: location.pathname }} />;
+  }
+
+  return <MobileLayout />;
+}
+
+function ProtectedStandaloneLayout() {
+  const isAuthenticated = useStore((state) => state.isAuthenticated);
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/onboarding" replace state={{ from: location.pathname }} />;
+  }
+
+  return <StandaloneLayout />;
+}
+
+function lazyDefault<TModule extends { default: ComponentType }>(loader: () => Promise<TModule>) {
+  return async () => {
+    const module = await loader();
+    return { Component: module.default };
+  };
+}
+
+function lazyNamed<TModule extends Record<string, unknown>, TName extends keyof TModule & string>(
+  loader: () => Promise<TModule>,
+  exportName: TName,
+) {
+  return async () => {
+    const module = await loader();
+    return { Component: module[exportName] as ComponentType };
+  };
+}
+
+const routes = [
   {
-    path: "/onboarding",
-    Component: StandaloneLayout,
-    children: [
-      { index: true, Component: Onboarding }
-    ]
+    path: "/",
+    Component: RootEntry,
   },
   {
     path: "/login",
-    Component: StandaloneLayout,
-    children: [
-      { index: true, Component: Login }
-    ]
+    Component: PublicStandaloneLayout,
+    children: [{ index: true, Component: LoginPage }],
+  },
+  {
+    path: "/onboarding",
+    Component: PublicStandaloneLayout,
+    children: [{ index: true, lazy: lazyDefault(() => import("./pages/Onboarding")) }],
   },
   {
     path: "/signup",
-    Component: StandaloneLayout,
-    children: [
-      { index: true, Component: Signup }
-    ]
+    Component: PublicStandaloneLayout,
+    children: [{ index: true, lazy: lazyDefault(() => import("./pages/Signup")) }],
   },
   {
     path: "/forgot-password",
-    Component: StandaloneLayout,
-    children: [
-      { index: true, Component: ForgotPassword }
-    ]
+    Component: PublicStandaloneLayout,
+    children: [{ index: true, lazy: lazyDefault(() => import("./pages/ForgotPassword")) }],
+  },
+  {
+    path: "/legacy/login",
+    Component: PublicStandaloneLayout,
+    children: [{ index: true, lazy: lazyDefault(() => import("./pages/Login")) }],
   },
   {
     path: "/",
-    Component: MobileLayout,
+    Component: ProtectedMobileLayout,
     children: [
-      { index: true, Component: Home },
-      { path: "courses", Component: Catalog },
-      { path: "progress", element: <Navigate to="/profile" replace /> },
-      { path: "profile", Component: Profile },
-      { path: "dashboard", Component: Dashboard },
+      { path: "home", lazy: lazyDefault(() => import("./pages/Home")) },
+      { path: "catalog", lazy: lazyDefault(() => import("./pages/Catalog")) },
+      { path: "courses", lazy: lazyNamed(() => import("./pages/Courses"), "Courses") },
+      { path: "dashboard", lazy: lazyDefault(() => import("./pages/Dashboard")) },
+      { path: "profile", lazy: lazyDefault(() => import("./pages/Profile")) },
     ],
   },
   {
     path: "/",
-    Component: StandaloneLayout,
+    Component: ProtectedStandaloneLayout,
     children: [
-      { path: "course/:id", Component: CourseDetail },
-      { path: "course/:id/lesson/:lessonId", Component: Lesson },
-      { path: "course/:id/lesson/:lessonId/quiz", Component: Quiz },
-      { path: "course/:id/test", Component: Test },
-      { path: "course/:id/result", Component: Result },
-      { path: "course/:id/certificate", Component: Certificate },
-    ]
-  }
-]);
+      { path: "course/:id", lazy: lazyDefault(() => import("./pages/CourseDetail")) },
+      { path: "course/:id/lesson/:lessonId", lazy: lazyDefault(() => import("./pages/Lesson")) },
+      { path: "course/:id/lesson/:lessonId/pdf", lazy: lazyDefault(() => import("./pages/PdfViewer")) },
+      { path: "course/:id/lesson/:lessonId/quiz", lazy: lazyDefault(() => import("./pages/Quiz")) },
+      { path: "course/:id/test", lazy: lazyDefault(() => import("./pages/Test")) },
+      { path: "course/:id/result", lazy: lazyDefault(() => import("./pages/Result")) },
+      { path: "course/:id/certificate", lazy: lazyDefault(() => import("./pages/Certificate")) },
+      { path: "legacy/course/:id", lazy: lazyNamed(() => import("./pages/Course"), "Course") },
+    ],
+  },
+];
+
+const createRouter = USE_HASH_ROUTER ? createHashRouter : createBrowserRouter;
+
+export const router = createRouter(routes, {
+  basename: import.meta.env.BASE_URL,
+});
