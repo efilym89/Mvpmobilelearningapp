@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { Home, BookOpen, User, PieChart } from "lucide-react";
+import { Home, BookOpen, User, LayoutDashboard } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { useStore } from "../../store";
 
 export function DeviceContainer({ children, withNav = false }: { children: React.ReactNode, withNav?: boolean }) {
   return (
@@ -38,23 +39,22 @@ export function StandaloneLayout() {
 function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const isAdmin = useStore((state) => state.isAdmin);
 
   const navItems = [
     { icon: Home, label: "Главная", path: "/" },
     { icon: BookOpen, label: "Курсы", path: "/courses" },
-    { icon: PieChart, label: "Прогресс", path: "/progress" },
     { icon: User, label: "Профиль", path: "/profile" },
   ];
+
+  if (isAdmin) {
+    navItems.push({ icon: LayoutDashboard, label: "Дашборд", path: "/dashboard" });
+  }
 
   return (
     <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-white border-t border-gray-100 flex items-center justify-around px-2 z-50 sm:rounded-b-[32px]">
       {navItems.map((item) => {
-        const isCurrent = location.pathname === item.path;
-        // Mock alias matching
-        const isAlias = (location.pathname === '/' && item.path === '/') || 
-                        (location.pathname === '/courses' && item.path === '/courses') ||
-                        (location.pathname === '/progress' && item.path === '/progress') ||
-                        (location.pathname === '/profile' && item.path === '/profile');
+        const isCurrent = location.pathname === item.path || (location.pathname.startsWith(item.path) && item.path !== '/');
 
         return (
           <button

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { motion } from "motion/react";
-import { ChevronLeft, PlayCircle, BookOpen, CheckCircle2, Lock, Sparkles } from "lucide-react";
+import { ChevronLeft, PlayCircle, BookOpen, CheckCircle2, Lock, Sparkles, Clock, AlertCircle } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
 import { courses } from "../lib/mock-data";
 import { Button } from "../components/ui/Button";
@@ -49,6 +49,26 @@ export default function CourseDetail() {
 
         <div className="relative z-10 pr-8">
           <h1 className="text-3xl font-extrabold mb-4 leading-tight">{course.title}</h1>
+          
+          {/* Status Badges */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {course.isMandatory && (
+              <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-white bg-white/20 px-2 py-1 rounded-md shadow-sm">
+                <AlertCircle size={12} /> Обязательный
+              </span>
+            )}
+            {course.isAssigned && !course.isMandatory && (
+              <span className="text-[10px] uppercase font-bold text-white bg-white/20 px-2 py-1 rounded-md shadow-sm">
+                Назначен
+              </span>
+            )}
+            {course.deadline && (
+              <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-red-100 bg-red-500/30 px-2 py-1 rounded-md shadow-sm">
+                <Clock size={12} /> до {new Date(course.deadline).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+              </span>
+            )}
+          </div>
+
           <p className="text-white/80 text-base leading-relaxed mb-8 font-medium">{course.description}</p>
           
           <div className="flex flex-col gap-6">

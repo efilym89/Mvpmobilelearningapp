@@ -11,12 +11,16 @@ interface Course {
 }
 
 interface UserState {
+  isAdmin: boolean;
+  toggleAdmin: () => void;
   courses: Course[];
   markLessonComplete: (courseId: string) => void;
   markTestPassed: (courseId: string) => void;
 }
 
 export const useStore = create<UserState>((set) => ({
+  isAdmin: false,
+  toggleAdmin: () => set((state) => ({ isAdmin: !state.isAdmin })),
   courses: [
     {
       id: "1",

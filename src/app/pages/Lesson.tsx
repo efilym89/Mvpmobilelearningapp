@@ -117,13 +117,26 @@ export default function Lesson() {
           </span>
           {lesson.isCompleted && (
             <span className="flex items-center gap-1.5 text-xs font-bold text-[#A3B096] bg-[#A3B096]/10 px-3 py-1 rounded-full ml-auto">
-              <CheckCircle2 size={14} /> Просмотрено
+              <CheckCircle2 size={14} /> Завершен
             </span>
           )}
         </div>
 
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-2 leading-tight">{lesson.title}</h1>
+        <h1 className="text-2xl font-extrabold text-gray-900 mb-6 leading-tight">{lesson.title}</h1>
         
+        {/* Condition for Completion Block */}
+        {!lesson.isCompleted && (
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 mb-6">
+            <h4 className="text-sm font-bold text-orange-800 mb-2 flex items-center gap-2">
+              <CheckCircle2 size={16} /> Что нужно для завершения:
+            </h4>
+            <ul className="text-xs font-medium text-orange-700 space-y-1.5 pl-6 list-disc">
+              <li>Посмотреть видео до конца (сейчас {progress}%)</li>
+              <li>Успешно пройти проверочный квиз</li>
+            </ul>
+          </div>
+        )}
+
         {/* Watch Progress Display */}
         {!lesson.isCompleted && progress > 0 && (
           <div className="flex items-center gap-3 mb-6 bg-gray-50 p-4 rounded-tl-2xl rounded-br-2xl rounded-tr-md rounded-bl-md border border-gray-100">
@@ -171,29 +184,39 @@ export default function Lesson() {
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-white/0 z-40 pb-8 flex flex-col gap-4">
         {lesson.isCompleted ? (
           <div className="bg-green-50 text-green-700 px-4 py-3 rounded-2xl border border-green-100 text-sm font-bold flex items-center justify-center gap-2 shadow-sm">
-            <CheckCircle2 size={18} /> Следующий урок открыт
+            <CheckCircle2 size={18} /> Урок пройден, следующий открыт
           </div>
-        ) : null}
+        ) : (
+          <div className="flex gap-3">
+            <Button 
+              variant="outline"
+              size="lg"
+              className="flex-1 shadow-sm"
+              onClick={() => setIsPlaying(true)}
+            >
+              {progress > 0 ? "Продолжить просмотр" : "Начать просмотр"}
+            </Button>
+            <Button 
+              variant={isRose ? "primary" : "secondary"}
+              size="lg"
+              className="flex-1 shadow-2xl"
+              onClick={() => navigate(`/course/${id}/lesson/${lesson.id}/quiz`)}
+            >
+              Пройти квиз
+            </Button>
+          </div>
+        )}
 
-        <Button 
-          variant={isRose ? "primary" : "secondary"}
-          size="lg"
-          onClick={() => {
-            if (isTest) {
-              navigate(`/course/${id}/test`);
-            } else if (lesson.isCompleted) {
-              navigate(`/course/${id}`);
-            } else {
-              // Navigate to lesson quiz
-              navigate(`/course/${id}/lesson/${lesson.id}/quiz`);
-            }
-          }}
-          className="shadow-2xl"
-        >
-          {isTest 
-            ? "Начать итоговый тест" 
-            : (lesson.isCompleted ? "Вернуться к курсу" : "Пройти квиз по уроку")}
-        </Button>
+        {lesson.isCompleted && (
+          <Button 
+            variant={isRose ? "primary" : "secondary"}
+            size="lg"
+            onClick={() => navigate(`/course/${id}`)}
+            className="shadow-2xl"
+          >
+            Вернуться к курсу
+          </Button>
+        )}
       </div>
     </motion.div>
   );

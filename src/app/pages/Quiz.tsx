@@ -12,6 +12,7 @@ export default function Quiz() {
   const navigate = useNavigate();
   const course = courses.find((c) => c.id === id) || courses[0];
   
+  const [hasStarted, setHasStarted] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<"pass" | "fail" | null>(null);
@@ -36,6 +37,7 @@ export default function Quiz() {
   const handleRetry = () => {
     setSelectedOption(null);
     setResult(null);
+    setHasStarted(false);
   };
 
   const handleContinue = () => {
@@ -130,6 +132,46 @@ export default function Quiz() {
             </>
           )}
         </motion.div>
+      </motion.div>
+    );
+  }
+
+  if (!hasStarted && !result) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        className="min-h-full bg-[#F8F9FA] flex flex-col p-6 pb-12 justify-between"
+      >
+        <div className="flex flex-col flex-1 justify-center items-center text-center">
+          <div className={cn("w-20 h-20 rounded-full flex items-center justify-center mb-6", isRose ? "bg-[#A7738B]/10 text-[#A7738B]" : "bg-[#A3B096]/10 text-[#A3B096]")}>
+            <Check size={32} />
+          </div>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-4">Промежуточный квиз</h2>
+          <p className="text-gray-500 text-sm max-w-[280px]">
+            Для разблокировки следующего урока ответьте на контрольный вопрос.
+          </p>
+        </div>
+        
+        <div className="flex flex-col gap-4">
+          <Button 
+            variant={isRose ? "primary" : "secondary"}
+            size="lg"
+            className="w-full"
+            onClick={() => setHasStarted(true)}
+          >
+            Начать квиз
+          </Button>
+          <Button 
+            variant="ghost"
+            size="lg"
+            className="w-full text-gray-500 hover:text-gray-900"
+            onClick={() => navigate(-1)}
+          >
+            Вернуться назад
+          </Button>
+        </div>
       </motion.div>
     );
   }

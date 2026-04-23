@@ -7,14 +7,16 @@ import { mockUser, courses, mockEmployees } from "../lib/mock-data";
 import { Card } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import { cn } from "../lib/utils";
+import { useStore } from "../store";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { isAdmin } = useStore();
   const [activeTab, setActiveTab] = useState<"courses" | "employees">("courses");
   const [searchQuery, setSearchQuery] = useState("");
 
   // If the user somehow gets here without access
-  if (!mockUser.isAdmin) {
+  if (!isAdmin) {
     return (
       <motion.div
         initial={{ opacity: 0 }}

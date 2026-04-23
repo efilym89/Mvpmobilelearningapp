@@ -9,10 +9,12 @@ import CourseDetail from "./pages/CourseDetail";
 import Lesson from "./pages/Lesson";
 import Test from "./pages/Test";
 import Result from "./pages/Result";
-import ProgressTracking from "./pages/ProgressTracking";
 import Profile from "./pages/Profile";
 import Quiz from "./pages/Quiz";
 import Certificate from "./pages/Certificate";
+import Dashboard from "./pages/Dashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+import { Navigate } from "react-router";
 
 export const router = createBrowserRouter([
   {
@@ -37,13 +39,21 @@ export const router = createBrowserRouter([
     ]
   },
   {
+    path: "/forgot-password",
+    Component: StandaloneLayout,
+    children: [
+      { index: true, Component: ForgotPassword }
+    ]
+  },
+  {
     path: "/",
     Component: MobileLayout,
     children: [
       { index: true, Component: Home },
       { path: "courses", Component: Catalog },
-      { path: "progress", Component: ProgressTracking },
+      { path: "progress", element: <Navigate to="/profile" replace /> },
       { path: "profile", Component: Profile },
+      { path: "dashboard", Component: Dashboard },
     ],
   },
   {

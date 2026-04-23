@@ -1,15 +1,24 @@
 import * as React from "react";
-import { motion } from "motion/react";
-import { Sparkles } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Sparkles, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
+import { cn } from "../lib/utils";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [hasError, setHasError] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    if (email === "error@annaelle.ru") {
+      setHasError(true);
+      return;
+    }
     navigate("/");
   };
 
@@ -40,22 +49,51 @@ export default function Login() {
         </div>
         
         <form onSubmit={handleLogin} className="space-y-6">
+          <AnimatePresence>
+            {hasError && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -10, height: 0 }}
+                className="bg-red-50 text-red-600 px-4 py-3 rounded-xl border border-red-100 text-sm font-bold flex items-start gap-2 shadow-sm"
+              >
+                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                <span>Неверный email или пароль. Пожалуйста, проверьте данные и попробуйте снова.</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-gray-500" htmlFor="email">
               Email
             </label>
-            <Input id="email" type="email" placeholder="name@annaelle.ru" required />
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="name@annaelle.ru (error@... для ошибки)" 
+              required 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={cn(hasError && "border-red-300 focus:border-red-500 focus:ring-red-500/10")}
+            />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold uppercase tracking-wider text-gray-500" htmlFor="password">
                 Пароль
               </label>
-              <a href="#" className="text-sm font-bold text-[#A7738B] hover:text-[#976077] transition-colors">
+              <button type="button" onClick={() => navigate("/forgot-password")} className="text-sm font-bold text-[#A7738B] hover:text-[#976077] transition-colors">
                 Забыли пароль?
-              </a>
+              </button>
             </div>
-            <Input id="password" type="password" required />
+            <Input 
+              id="password" 
+              type="password" 
+              required 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={cn(hasError && "border-red-300 focus:border-red-500 focus:ring-red-500/10")}
+            />
           </div>
           <div className="pt-6">
             <Button type="submit" size="lg">

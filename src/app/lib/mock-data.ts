@@ -1,11 +1,40 @@
 export const mockUser = {
   name: "Александр",
-  role: "Менеджер по продажам",
+  role: "Бьюти Мастер",
+  isAdmin: true,
   avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=256&h=256",
   completedCourses: 4,
   averageScore: 92,
-  learningHours: 12
+  learningHours: 12,
+  level: "Старший специалист",
+  levelProgress: 75,
+  levelPointsToNext: 50
 };
+
+export const news = [
+  {
+    id: "n1",
+    title: "Новый стандарт обслуживания клиентов",
+    description: "Внедряем обновленные скрипты и правила этикета при встрече гостей в салоне. Ознакомьтесь с нововведениями до конца недели.",
+    date: "2026-04-20",
+    image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=800&h=400",
+    tag: "Важное"
+  },
+  {
+    id: "n2",
+    title: "Поступление новой линейки эко-косметики",
+    description: "На склад поступили долгожданные средства от EcoGlow. Завтра пройдет вебинар по применению новых продуктов в работе.",
+    date: "2026-04-22",
+    image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800&h=400",
+    tag: "Новинки"
+  }
+];
+
+export const mockEmployees = [
+  { id: "e1", name: "Елена Смирнова", role: "Дизайнер", progress: 80, courses: 3 },
+  { id: "e2", name: "Иван Петров", role: "Разработчик", progress: 45, courses: 2 },
+  { id: "e3", name: "Анна Иванова", role: "Аналитик", progress: 100, courses: 5 },
+];
 
 export const courses = [
   {
@@ -16,6 +45,10 @@ export const courses = [
     totalLessons: 6,
     completedLessons: 2,
     color: "rose", // "rose" | "green"
+    status: "в процессе", // "не начат" | "в процессе" | "завершен" | "просрочен"
+    isAssigned: true,
+    isMandatory: true,
+    deadline: "2026-05-01",
     lessons: [
       { id: "101", title: "Введение в этику", duration: "5 мин", type: "видео", day: 1, isCompleted: true, quizPassed: true, progress: 100, thumbnail: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=1600&h=900" },
       { id: "102", title: "Поведение на рабочем месте", duration: "8 мин", type: "видео", day: 1, isCompleted: true, quizPassed: true, progress: 100, thumbnail: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=1600&h=900" },
@@ -33,6 +66,11 @@ export const courses = [
     totalLessons: 4,
     completedLessons: 1,
     color: "green",
+    status: "в процессе",
+    isAssigned: true,
+    isMandatory: false,
+    isRecommended: true,
+    deadline: null,
     lessons: [
       { id: "201", title: "Активное слушание", duration: "6 мин", type: "видео", day: 1, isCompleted: true, quizPassed: true, progress: 100, thumbnail: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=1600&h=900" },
       { id: "202", title: "Написание понятных писем", duration: "5 мин", type: "видео", day: 1, isCompleted: false, quizPassed: false, progress: 30, thumbnail: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=1600&h=900" },
@@ -48,6 +86,11 @@ export const courses = [
     totalLessons: 3,
     completedLessons: 0,
     color: "rose",
+    status: "не начат",
+    isAssigned: false,
+    isMandatory: false,
+    isRecommended: false,
+    deadline: null,
     lessons: [
       { id: "301", title: "Модели угроз", duration: "10 мин", type: "видео", day: 1, isCompleted: false, quizPassed: false, progress: 0, thumbnail: "https://images.unsplash.com/photo-1563986768494-4dee2763ff0f?auto=format&fit=crop&q=80&w=1600&h=900" },
       { id: "302", title: "Безопасная разработка", duration: "15 мин", type: "видео", day: 1, isCompleted: false, quizPassed: false, progress: 0, thumbnail: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=1600&h=900" },
@@ -75,7 +118,7 @@ export const mockTest = [
       "Когда партнер запрашивает их",
       "Только при явном разрешении и в рамках правил комплаенса",
       "Когда вы считаете, что это поможет закрыть сделку",
-      "Никогда, ни при каких обстоятельствах"
+      "Ни��огда, ни при каких обстоятельствах"
     ],
     correctAnswer: 1
   },

@@ -1,10 +1,13 @@
 import * as React from "react";
 import { motion } from "motion/react";
-import { Settings, Award, BookOpen, Clock, Target, Sparkles } from "lucide-react";
-import { mockUser } from "../lib/mock-data";
+import { Settings, Award, BookOpen, Clock, Target, Sparkles, LogOut, HelpCircle, FileText, ToggleLeft, ToggleRight, Medal } from "lucide-react";
+import { mockUser, courses } from "../lib/mock-data";
 import { Card } from "../components/ui/Card";
+import { useStore } from "../store";
 
 export default function Profile() {
+  const { isAdmin, toggleAdmin } = useStore();
+
   const stats = [
     { label: "Пройдено курсов", value: mockUser.completedCourses, icon: BookOpen, color: "text-[#A7738B]", bg: "bg-[#A7738B]/10" },
     { label: "Часов обучения", value: mockUser.learningHours, icon: Clock, color: "text-[#A3B096]", bg: "bg-[#A3B096]/10" },
@@ -44,40 +47,22 @@ export default function Profile() {
           </motion.div>
           <h2 className="text-2xl font-extrabold text-gray-900 mb-2">{mockUser.name}</h2>
           <p className="text-sm font-medium text-[#A7738B] bg-[#A7738B]/10 px-4 py-1 rounded-full inline-block">
-            {mockUser.role}
+            {isAdmin ? "Администратор" : mockUser.role}
           </p>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="px-6 py-8">
-        <h3 className="text-lg font-bold text-gray-900 mb-6">Ваша статистика</h3>
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          {stats.map((stat, i) => (
-            <Card key={i} className="p-6 flex flex-col gap-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
-                <stat.icon size={24} />
-              </div>
-              <div>
-                <p className="text-2xl font-extrabold text-gray-900 leading-none mb-2">
-                  {stat.value}
-                </p>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                  {stat.label}
-                </p>
-              </div>
-            </Card>
-          ))}
-        </div>
-
+      {/* Main Content */}
+      <div className="px-6 py-6 space-y-8">
+        
         {/* Level Progress */}
-        <Card className="p-6 bg-[#A3B096] text-white overflow-hidden relative">
+        <Card className="p-6 bg-[#A3B096] text-white overflow-hidden relative shadow-lg">
           <Sparkles className="absolute -top-6 -right-6 text-white/20" size={100} strokeWidth={1} />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-sm font-semibold opacity-80 uppercase tracking-wider mb-2">Текущий уровень</p>
-                <p className="text-xl font-extrabold">Старший специалист</p>
+                <p className="text-[10px] font-bold opacity-80 uppercase tracking-wider mb-2">Текущий уровень</p>
+                <p className="text-xl font-extrabold">{mockUser.level}</p>
               </div>
               <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
                 <Target size={24} />
@@ -85,22 +70,133 @@ export default function Profile() {
             </div>
             
             <div className="flex flex-col gap-2">
-              <div className="flex justify-between text-xs font-medium text-white/80">
+              <div className="flex justify-between text-xs font-bold text-white/80">
                 <span>Уровень 4</span>
                 <span>Уровень 5 (200 очков)</span>
               </div>
-              <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-black/20 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-white rounded-full"
                   initial={{ width: 0 }}
-                  animate={{ width: "75%" }}
+                  animate={{ width: `${mockUser.levelProgress}%` }}
                   transition={{ duration: 1, delay: 0.2 }}
                 />
               </div>
-              <p className="text-xs opacity-70 mt-2">Осталось 50 очков до следующего уровня</p>
+              <p className="text-[10px] opacity-70 mt-2 font-bold uppercase tracking-wider">Осталось {mockUser.levelPointsToNext} очков до следующего уровня</p>
             </div>
           </div>
         </Card>
+
+        {/* Stats Grid */}
+        <div>
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Target size={20} className="text-[#A7738B]" /> Ваша статистика
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            {stats.map((stat, i) => (
+              <Card key={i} className="p-4 flex flex-col gap-3 shadow-sm border border-gray-50">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
+                  <stat.icon size={20} />
+                </div>
+                <div>
+                  <p className="text-xl font-extrabold text-gray-900 leading-none mb-1">
+                    {stat.value}
+                  </p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 leading-tight">
+                    {stat.label}
+                  </p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Achievements */}
+        <div>
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Award size={20} className="text-[#A3B096]" /> Достижения
+          </h3>
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
+            {[
+              { title: "Быстрый старт", desc: "Пройден первый курс", icon: Sparkles, color: "text-yellow-500", bg: "bg-yellow-50" },
+              { title: "Перфекционист", desc: "Все тесты на 100%", icon: Target, color: "text-[#A7738B]", bg: "bg-[#A7738B]/10" },
+              { title: "Лидер месяца", desc: "Топ-5 в рейтинге", icon: Medal, color: "text-[#A3B096]", bg: "bg-[#A3B096]/10" }
+            ].map((ach, i) => (
+              <div key={i} className="min-w-[140px] bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col items-center text-center gap-2">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${ach.bg} ${ach.color} mb-1`}>
+                  <ach.icon size={24} />
+                </div>
+                <p className="text-sm font-bold text-gray-900 leading-tight">{ach.title}</p>
+                <p className="text-[10px] text-gray-500 font-medium leading-tight">{ach.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Current & Completed Courses overview */}
+        <div>
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <BookOpen size={20} className="text-[#A3B096]" /> Мое обучение
+          </h3>
+          <div className="flex flex-col gap-3">
+            {/* Show an active course */}
+            <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-600">В процессе</span>
+                <span className="text-sm font-bold text-gray-900 line-clamp-1">{courses[0].title}</span>
+              </div>
+              <div className="text-right">
+                <span className="text-sm font-bold text-[#A7738B]">{courses[0].progress}%</span>
+              </div>
+            </div>
+
+            {/* Show a completed course mock */}
+            <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex items-center justify-between opacity-70">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Завершен</span>
+                <span className="text-sm font-bold text-gray-900 line-clamp-1">Основы безопасности</span>
+              </div>
+              <div className="text-right flex gap-2 items-center">
+                <FileText size={16} className="text-gray-400" />
+                <span className="text-sm font-bold text-[#A3B096]">100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div>
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center justify-between">
+            Настройки
+            <span className="text-[10px] font-normal text-gray-400 uppercase tracking-wider bg-gray-100 px-2 py-1 rounded-md">
+              Демо-режим
+            </span>
+          </h3>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+            <button 
+              onClick={toggleAdmin}
+              className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors text-left border-b border-gray-50"
+            >
+              <div className="flex items-center gap-3">
+                <Settings size={20} className={isAdmin ? "text-[#A7738B]" : "text-gray-400"} />
+                <span className="text-sm font-bold text-gray-700">Права администратора</span>
+              </div>
+              {isAdmin ? (
+                <ToggleRight size={24} className="text-[#A7738B]" />
+              ) : (
+                <ToggleLeft size={24} className="text-gray-300" />
+              )}
+            </button>
+            <button className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-left border-b border-gray-50">
+              <HelpCircle size={20} className="text-gray-400" />
+              <span className="text-sm font-bold text-gray-700">Поддержка</span>
+            </button>
+            <button className="flex items-center gap-3 p-4 hover:bg-red-50 text-red-500 transition-colors text-left">
+              <LogOut size={20} />
+              <span className="text-sm font-bold">Выйти из аккаунта</span>
+            </button>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

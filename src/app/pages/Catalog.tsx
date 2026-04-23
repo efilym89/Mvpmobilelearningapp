@@ -88,25 +88,6 @@ export default function Catalog() {
                   onClick={() => navigate(`/course/${course.id}`)}
                 >
                   <Card hoverable className="p-6 overflow-hidden relative group h-full">
-                    {/* Status Badges */}
-                    <div className="absolute top-0 right-0 p-4 flex flex-col gap-1 items-end z-10">
-                      {course.isMandatory && (
-                        <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">
-                          <AlertCircle size={10} /> Обязательный
-                        </span>
-                      )}
-                      {course.isAssigned && !course.isMandatory && (
-                        <span className="text-[10px] uppercase font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md">
-                          Назначен
-                        </span>
-                      )}
-                      {course.status === "в процессе" && (
-                        <span className="text-[10px] uppercase font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md">
-                          В процессе
-                        </span>
-                      )}
-                    </div>
-                    
                     <div className="flex gap-4 items-start h-full flex-col sm:flex-row">
                       <div className={cn(
                         "w-14 h-14 rounded-tl-2xl rounded-br-2xl rounded-tr-md rounded-bl-md flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-110 duration-300",
@@ -114,17 +95,10 @@ export default function Catalog() {
                       )}>
                         <BookOpen size={24} strokeWidth={1.5} />
                       </div>
-                      <div className="flex-1 pt-12 sm:pt-0 sm:pr-24 flex flex-col h-full justify-between w-full">
+                      <div className="flex-1 pt-2 sm:pt-0 sm:pr-4 flex flex-col h-full justify-between w-full">
                         <div>
                           <h4 className="font-extrabold text-gray-900 text-base leading-tight mb-2 pr-2">{course.title}</h4>
                           <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">{course.description}</p>
-                          
-                          {course.deadline && (
-                            <div className="flex items-center gap-1 text-[11px] font-bold text-red-500 mb-3">
-                              <Clock size={14} />
-                              Дедлайн: {new Date(course.deadline).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
-                            </div>
-                          )}
                         </div>
                         
                         <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-gray-400 mt-auto">
@@ -135,6 +109,18 @@ export default function Catalog() {
                             <Star size={16} className={course.color === "rose" ? "text-[#A7738B]" : "text-[#A3B096]"} /> 
                             {course.totalLessons} уроков
                           </span>
+                          {course.progress > 0 && course.progress < 100 && (
+                            <span className="w-full flex items-center gap-2 mt-2">
+                              <span className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <motion.span 
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${course.progress}%` }}
+                                  className={cn("h-full block", course.color === "rose" ? "bg-[#A7738B]" : "bg-[#A3B096]")} 
+                                />
+                              </span>
+                              <span className="text-[10px] font-bold text-gray-500">{course.progress}%</span>
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

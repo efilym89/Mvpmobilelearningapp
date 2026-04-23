@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Check } from "lucide-react";
+import { X, Check, Clock, AlertCircle } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
 import { courses, mockTest } from "../lib/mock-data";
 import { Button } from "../components/ui/Button";
@@ -12,6 +12,7 @@ export default function Test() {
   const navigate = useNavigate();
   const course = courses.find((c) => c.id === id) || courses[0];
 
+  const [hasStarted, setHasStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,6 +35,65 @@ export default function Test() {
 
   const question = mockTest[currentQuestion];
   const progressPercent = ((currentQuestion + 1) / mockTest.length) * 100;
+
+  if (!hasStarted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        className="min-h-full bg-[#F8F9FA] flex flex-col p-6 pb-12 justify-between"
+      >
+        <div className="flex flex-col flex-1 justify-center items-center text-center">
+          <div className={cn("w-24 h-24 rounded-tl-[32px] rounded-br-[32px] rounded-tr-[8px] rounded-bl-[8px] flex items-center justify-center mb-8 shadow-sm", isRose ? "bg-[#A7738B]/10 text-[#A7738B]" : "bg-[#A3B096]/10 text-[#A3B096]")}>
+            <AlertCircle size={40} />
+          </div>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-4 leading-tight">Итоговое<br/>тестирование</h2>
+          <p className="text-gray-500 text-sm max-w-[280px] mb-8">
+            Вам предстоит пройти финальное испытание для получения сертификата по курсу «{course.title}».
+          </p>
+
+          <div className="w-full bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4 text-left">
+            <div className="flex items-center justify-between border-b border-gray-50 pb-4">
+              <span className="text-sm font-medium text-gray-500">Количество вопросов</span>
+              <span className="text-sm font-bold text-gray-900">{mockTest.length}</span>
+            </div>
+            <div className="flex items-center justify-between border-b border-gray-50 pb-4">
+              <span className="text-sm font-medium text-gray-500">Проходной балл</span>
+              <span className="text-sm font-bold text-gray-900">80%</span>
+            </div>
+            <div className="flex items-center justify-between border-b border-gray-50 pb-4">
+              <span className="text-sm font-medium text-gray-500">Лимит попыток</span>
+              <span className="text-sm font-bold text-gray-900">3</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-500">Ограничение по времени</span>
+              <span className="text-sm font-bold text-gray-900 flex items-center gap-1"><Clock size={16}/> 15 мин</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex flex-col gap-4 mt-8">
+          <Button 
+            variant={isRose ? "primary" : "secondary"}
+            size="lg"
+            className="w-full shadow-2xl"
+            onClick={() => setHasStarted(true)}
+          >
+            Начать тестирование
+          </Button>
+          <Button 
+            variant="ghost"
+            size="lg"
+            className="w-full text-gray-500 hover:text-gray-900"
+            onClick={() => navigate(-1)}
+          >
+            Вернуться назад
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

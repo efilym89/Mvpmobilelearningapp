@@ -60,7 +60,8 @@ export default function Certificate() {
             </div>
 
             <p className="text-xs uppercase font-extrabold tracking-widest text-gray-400 mb-2">Настоящим подтверждается, что</p>
-            <h2 className="text-2xl font-serif font-extrabold text-gray-900 mb-6 border-b border-gray-100 pb-6 w-full">{mockUser.name}</h2>
+            <h2 className="text-2xl font-serif font-extrabold text-gray-900 mb-1 w-full">{mockUser.name}</h2>
+            <p className="text-sm font-medium text-gray-500 mb-6 border-b border-gray-100 pb-6 w-full">{mockUser.role}</p>
             
             <p className="text-xs uppercase font-extrabold tracking-widest text-gray-400 mb-2">Успешно прошел(ла) курс</p>
             <h3 className="text-xl font-extrabold text-gray-900 mb-8 leading-tight">«{course.title}»</h3>

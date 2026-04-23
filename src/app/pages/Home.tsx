@@ -1,10 +1,9 @@
 import * as React from "react";
 import { motion } from "motion/react";
-import { Search, Play, BookOpen, Star } from "lucide-react";
+import { Search, Play, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router";
-import { mockUser, courses } from "../lib/mock-data";
+import { mockUser, courses, news } from "../lib/mock-data";
 import { Card } from "../components/ui/Card";
-import { Progress } from "../components/ui/Progress";
 import { cn } from "../lib/utils";
 
 export default function Home() {
@@ -79,40 +78,35 @@ export default function Home() {
         </motion.div>
       </div>
 
-      {/* Courses List */}
+      {/* Company News List */}
       <div className="px-6 mt-4">
         <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <BookOpen size={20} className="text-[#A7738B]" /> Каталог курсов
+          <BookOpen size={20} className="text-[#A7738B]" /> Новости компании
         </h3>
 
-        <div className="flex flex-col gap-4">
-          {courses.slice(1).map((course, i) => (
+        <div className="flex flex-col gap-6">
+          {news.map((item) => (
             <Card
-              key={course.id}
+              key={item.id}
               hoverable
-              onClick={() => navigate(`/course/${course.id}`)}
-              className="p-6"
+              className="overflow-hidden bg-white"
             >
-              <div className="flex gap-4 items-start">
-                <div className={cn(
-                  "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm",
-                  course.color === "rose" ? "bg-[#A7738B]/10 text-[#A7738B]" : "bg-[#A3B096]/10 text-[#A3B096]"
-                )}>
-                  <Star size={24} className={course.color === "rose" ? "text-[#A7738B]" : "text-[#A3B096]"} />
+              <div className="h-48 w-full relative">
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-[#A7738B] shadow-sm">
+                  {item.tag}
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-gray-900 text-base leading-tight mb-2">{course.title}</h4>
-                  <p className="text-sm text-gray-500 mb-4 line-clamp-2">{course.description}</p>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <Progress value={course.progress} color={course.color as "rose" | "green"} />
-                    </div>
-                    <span className="text-xs font-bold text-gray-400 w-8 text-right">
-                      {course.progress}%
-                    </span>
-                  </div>
-                </div>
+              </div>
+              <div className="p-5">
+                <span className="text-xs text-gray-400 font-medium block mb-2">
+                  {new Date(item.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+                <h4 className="font-bold text-gray-900 text-lg leading-tight mb-2">{item.title}</h4>
+                <p className="text-sm text-gray-500 line-clamp-3">{item.description}</p>
               </div>
             </Card>
           ))}
