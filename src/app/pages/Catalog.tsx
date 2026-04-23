@@ -1,14 +1,14 @@
 import * as React from "react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Search, Filter, BookOpen, Star, Clock } from "lucide-react";
+import { Search, Filter, BookOpen, Star, Clock, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router";
 import { courses } from "../lib/mock-data";
 import { Card } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import { cn } from "../lib/utils";
 
-const filters = ["Все", "Обязательные", "В процессе", "Новые"];
+const filters = ["Все", "Обязательные", "Рекомендованные", "В процессе"];
 
 export default function Catalog() {
   const navigate = useNavigate();
@@ -17,7 +17,8 @@ export default function Catalog() {
 
   const filteredCourses = courses.filter((course) => {
     if (activeFilter === "В процессе") return course.progress > 0 && course.progress < 100;
-    if (activeFilter === "Обязательные") return course.color === "rose"; // Just a mock condition
+    if (activeFilter === "Обязательные") return course.isMandatory;
+    if (activeFilter === "Рекомендованные") return course.isRecommended;
     return true;
   }).filter((course) => course.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -27,10 +28,10 @@ export default function Catalog() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="pb-8 h-full flex flex-col"
+      className="pb-8"
     >
       {/* Header */}
-      <div className="bg-white pt-12 pb-4 px-6 relative z-10 sticky top-0 border-b border-gray-100 shadow-sm">
+      <div className="bg-white pt-12 pb-4 px-6 relative z-20 sticky top-0 border-b border-gray-100 shadow-sm">
         <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-6">Каталог курсов</h1>
 
         {/* Search */}
@@ -73,7 +74,7 @@ export default function Catalog() {
       </div>
 
       {/* Course List */}
-      <div className="flex-1 overflow-y-auto px-6 pt-6 bg-[#F8F9FA]">
+      <div className="px-6 pt-6">
         <AnimatePresence mode="popLayout">
           {filteredCourses.length > 0 ? (
             <motion.div className="flex flex-col gap-4">
@@ -86,27 +87,47 @@ export default function Catalog() {
                   transition={{ delay: i * 0.05 }}
                   onClick={() => navigate(`/course/${course.id}`)}
                 >
-                  <Card hoverable className="p-6 overflow-hidden relative group">
-                    {course.color === "rose" && (
-                      <div className="absolute top-0 right-0 p-4">
-                        <span className="bg-[#A7738B]/10 text-[#A7738B] px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
-                          Обязательно
+                  <Card hoverable className="p-6 overflow-hidden relative group h-full">
+                    {/* Status Badges */}
+                    <div className="absolute top-0 right-0 p-4 flex flex-col gap-1 items-end z-10">
+                      {course.isMandatory && (
+                        <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">
+                          <AlertCircle size={10} /> Обязательный
                         </span>
-                      </div>
-                    )}
+                      )}
+                      {course.isAssigned && !course.isMandatory && (
+                        <span className="text-[10px] uppercase font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md">
+                          Назначен
+                        </span>
+                      )}
+                      {course.status === "в процессе" && (
+                        <span className="text-[10px] uppercase font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md">
+                          В процессе
+                        </span>
+                      )}
+                    </div>
                     
-                    <div className="flex gap-4 items-start">
+                    <div className="flex gap-4 items-start h-full flex-col sm:flex-row">
                       <div className={cn(
                         "w-14 h-14 rounded-tl-2xl rounded-br-2xl rounded-tr-md rounded-bl-md flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-110 duration-300",
                         course.color === "rose" ? "bg-[#A7738B] text-white shadow-[#A7738B]/30" : "bg-[#A3B096] text-white shadow-[#A3B096]/30"
                       )}>
                         <BookOpen size={24} strokeWidth={1.5} />
                       </div>
-                      <div className="flex-1 pr-12">
-                        <h4 className="font-extrabold text-gray-900 text-base leading-tight mb-2">{course.title}</h4>
-                        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">{course.description}</p>
+                      <div className="flex-1 pt-12 sm:pt-0 sm:pr-24 flex flex-col h-full justify-between w-full">
+                        <div>
+                          <h4 className="font-extrabold text-gray-900 text-base leading-tight mb-2 pr-2">{course.title}</h4>
+                          <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">{course.description}</p>
+                          
+                          {course.deadline && (
+                            <div className="flex items-center gap-1 text-[11px] font-bold text-red-500 mb-3">
+                              <Clock size={14} />
+                              Дедлайн: {new Date(course.deadline).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
+                            </div>
+                          )}
+                        </div>
                         
-                        <div className="flex items-center gap-4 text-xs font-semibold text-gray-400">
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-gray-400 mt-auto">
                           <span className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-md">
                             <Clock size={16} /> {course.totalLessons * 10} мин
                           </span>
