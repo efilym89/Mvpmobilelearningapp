@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router"
 import { useStore } from "../store"
-import { Card, CardContent } from "../components/ui/Card"
+import { Card } from "../components/ui/Card"
 import { Progress } from "../components/ui/Progress"
 import { CheckCircle, PlayCircle, Clock } from "lucide-react"
 import { Button } from "../components/ui/Button"
@@ -29,7 +29,7 @@ export function Courses() {
               course.status === 'completed' ? 'bg-success' : 
               course.status === 'in_progress' ? 'bg-primary' : 'bg-muted'
             }`} />
-            <CardContent className="p-4 pt-5 flex gap-4">
+            <div className="p-4 pt-5 flex gap-4">
               <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-[12px] ${
                 course.status === 'completed' ? 'bg-success/20 text-success' : 
                 course.status === 'in_progress' ? 'bg-secondary text-primary' : 'bg-muted text-muted-foreground'
@@ -44,7 +44,7 @@ export function Courses() {
                   <span className="text-xs text-muted-foreground whitespace-nowrap">{course.progress}%</span>
                 </div>
               </div>
-            </CardContent>
+            </div>
           </Card>
         ))}
       </div>
